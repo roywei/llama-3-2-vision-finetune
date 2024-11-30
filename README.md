@@ -46,7 +46,7 @@ docker run --gpus all \
     --shm-size 32g \
     -p 30000:30000 \
     -v ~/.cache/huggingface:/root/.cache/huggingface \
-    --env "HF_TOKEN=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" \
+    --env "HF_TOKEN=YOUR_HF_TOKEN" \
     --ipc=host \
     lmsysorg/sglang:latest \
     python3 -m sglang.launch_server --model-path meta-llama/Llama-3.2-11B-Vision-Instruct --host 0.0.0.0 --port 30000 --chat-template llama_3_vision --api-key myapikeysglang
