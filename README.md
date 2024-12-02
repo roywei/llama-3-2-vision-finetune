@@ -54,7 +54,7 @@ Here's the finetuning section based on the provided guide:
 
 ## Fine-tuning Llama 3.2 Vision Model
 
-This section outlines the process for fine-tuning the Llama 3.2 Vision model using PyTorch FSDP on Amazon EKS.
+This section outlines the process for fine-tuning the Llama 3.2 Vision model using PyTorch FSDP on Amazon EKS. You will need a HuggingFace account and [HuggingFace Token](https://huggingface.co/docs/hub/en/security-tokens) setup for finetuning and deployment.
 
 ### Setup
 
@@ -94,20 +94,17 @@ Execute the fine-tuning job:
 This script will use the following PyTorch command that's defined in the [.env file](https://github.com/roywei/aws-do-eks/blob/llama-3-2-vision/Container-Root/eks/deployment/distributed-training/pytorch/pytorchjob/fsdp/.env#L40):
 
 ```bash
-torchrun --nnodes 1 --nproc_per_node 8 recipes/quickstart/finetuning/finetuning.py \
-  --enable_fsdp \
-  --lr 1e-5 \
-  --num_epochs 5 \
-  --batch_size_training 2 \
-  --model_name meta-llama/Llama-3.2-11B-Vision-Instruct \
-  --dist_checkpoint_root_folder ./finetuned_model \
-  --dist_checkpoint_folder fine-tuned \
-  --use_fast_kernels \
-  --dataset "custom_dataset" \
-  --custom_dataset.test_split "test" \
-  --custom_dataset.file "recipes/quickstart/finetuning/datasets/mind2web_dataset.py" \
-  --run_validation True \
-  --batching_strategy padding
+torchrun --nnodes 1 --nproc_per_node 8  \
+recipes/quickstart/finetuning/finetuning.py \
+--enable_fsdp --lr 1e-5  --num_epochs 3 \
+--batch_size_training 2 \
+--model_name meta-llama/Llama-3.2-11B-Vision-Instruct \
+--dist_checkpoint_root_folder ./finetuned_model \
+--dist_checkpoint_folder fine-tuned  \
+--use_fast_kernels \
+--dataset "custom_dataset" --custom_dataset.test_split "test" \
+--custom_dataset.file "recipes/quickstart/finetuning/datasets/mind2web_dataset.py"  \
+--run_validation True --batching_strategy padding
 ```
 
 ### Monitoring and Management
@@ -119,22 +116,46 @@ torchrun --nnodes 1 --nproc_per_node 8 recipes/quickstart/finetuning/finetuning.
 ### Custom Dataset
 For more details on the custom Mind2Web dataset, refer to the implementation [here](https://github.com/roywei/llama-recipes/blob/mind2web_finetune/recipes/quickstart/finetuning/datasets/mind2web_dataset.py) and the official llama-recipes [finetuning guide](https://github.com/meta-llama/llama-recipes/blob/main/recipes/quickstart/finetuning/finetune_vision_model.md).
 
+### Convert finetuned model to HuggingFace format
+After finetuning, you will need to convert the fintuned model (FSDP checkpoint) to HuggingFace format for easy deployment.
 
-#### Note: Remember to uploaded finetuned model to s3 after job is done.
+Run the following [helper script in llama-recipe](https://github.com/meta-llama/llama-recipes/tree/main/recipes/quickstart/inference/local_inference#inference-with-fsdp-checkpoints):
+```
+python -m llama_recipes.inference.checkpoint_converter_fsdp_hf  --fsdp_checkpoint_path finetuned_model/fine-tuned-meta-llama/Llama-3.2-11B-Vision-Instruct/  --consolidated_model_path finetuned_model/fine-tuned-meta-llama/Llama-3.2-11B-Vision-Instruct-HF/ --HF_model_path_or_name meta-llama/Llama-3.2-11B-Vision-Instruct
+```
+
+#### Note: Remember to uploaded finetuned model to s3 or HuggingFace Hub after job is done.
 
 ## Deployment
 
-We provide 3 deployment options based on your needs
-### Deploy on AWS Bedrock
+After fine-tuning your Llama 3.2 Vision model, you have several options for deployment. This section covers three deployment methods:
 
-You can import custom model on AWS Bedrock Console by following this guide https://aws.amazon.com/bedrock/custom-model-import/
-Simply click import model and select the S3 bucket with the finetune model, you will be able to run Bedrock inference with the same API as default llama 3.2 vision model.
+### Custom Model Import on AWS Bedrock
+AWS Bedrock allows you to import and use your custom-trained models seamlessly. Here's how to import your fine-tuned Llama 3.2 Vision model:
+
+Ensure your fine-tuned model is uploaded to an S3 bucket, and it's already converted to HuggingFace format.
+
+Navigate to the AWS Bedrock Console.
+
+In the left navigation pane, select "Foundation Models".
+
+Click on "Imported Models".
+
+Follow the import wizard:
+
+Choose the S3 bucket containing your fine-tuned model. Configure model settings as needed. Review and confirm the import. Wait for the import process to complete. This may take several minutes depending on the model size.
+
+Once imported, you can invoke your custom model using the same Bedrock API as the default Llama 3.2 Vision model. Just replace the llama3.2 model name with yoru imported model ARN.
+
+For detailed instructions, refer to the [AWS Bedrock Custom Model Import documentation](https://aws.amazon.com/bedrock/custom-model-import/).
+
 
 ### Deploy on AWS SageMaker with Stateful Inference
 Follow this guide to deploy on AWS SageMaker with stateful infernece capabilities: https://github.com/aws-samples/sagemaker-genai-hosting-examples/tree/main/Llama3/llama3-11b-vision/stateful
 
 
 ### Deploy on EC2 using SGLang
+You can also deploy your own SGLang model server on EC2, follow the [installation and setup guide](https://sgl-project.github.io/start/install.html) to run any local model.
 ```
 docker run --gpus all \
     --shm-size 32g \
@@ -148,15 +169,23 @@ docker run --gpus all \
 
 ## SeeAct Setup
 
-Clone and deploy SeeAct framework on your local laptop to let LLM automate web tasks.
+Clone and deploy the SeeAct framework on your local laptop to let LLM automate web tasks, 
 https://github.com/roywei/SeeAct/tree/sglang
 
+Run demo using this command:
+```
+python seeact.py -c config/demo_mode.toml
+```
 
+### All Code Repositories:
 
+- [Modified Llama-recipes](https://github.com/roywei/llama-recipes/blob/mind2web_finetune/recipes/quickstart/finetuning/datasets/mind2web_dataset.py)
+- [Modified EKS PyTorch FSDP Job](https://github.com/roywei/aws-do-eks/tree/llama-3-2-vision)
+- [Modified SeeAct repository](https://github.com/roywei/SeeAct/tree/sglang)
 
-References:
+### References:
 
-https://github.com/OSU-NLP-Group/SeeAct
-https://huggingface.co/datasets/osunlp/Multimodal-Mind2Web?row=0
-https://github.com/OSU-NLP-Group/Mind2Web
-https://aws.amazon.com/blogs/machine-learning/scale-llms-with-pytorch-2-0-fsdp-on-amazon-eks-part-2/
+- https://github.com/OSU-NLP-Group/SeeAct
+- https://huggingface.co/datasets/osunlp/Multimodal-Mind2Web?row=0
+- https://github.com/OSU-NLP-Group/Mind2Web
+- https://aws.amazon.com/blogs/machine-learning/scale-llms-with-pytorch-2-0-fsdp-on-amazon-eks-part-2/
