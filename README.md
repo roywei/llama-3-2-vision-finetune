@@ -124,7 +124,11 @@ Run the following [helper script in llama-recipe](https://github.com/meta-llama/
 python -m llama_recipes.inference.checkpoint_converter_fsdp_hf  --fsdp_checkpoint_path finetuned_model/fine-tuned-meta-llama/Llama-3.2-11B-Vision-Instruct/  --consolidated_model_path finetuned_model/fine-tuned-meta-llama/Llama-3.2-11B-Vision-Instruct-HF/ --HF_model_path_or_name meta-llama/Llama-3.2-11B-Vision-Instruct
 ```
 
-#### Note: Remember to uploaded finetuned model to s3 or HuggingFace Hub after job is done.
+#### Note: 
+***Remember to uploaded finetuned model to s3 or HuggingFace Hub after job is done.***
+Here is a uploaded finetuned version on [HuggingFace](https://huggingface.co/roywei/Llama-3.2-11B-Vision-Instruct-mind2web-finetuned)
+
+
 
 ## Deployment
 
