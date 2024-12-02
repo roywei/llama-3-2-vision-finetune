@@ -172,7 +172,11 @@ docker run --gpus all \
 Clone and deploy the SeeAct framework on your local laptop to let LLM automate web tasks, 
 https://github.com/roywei/SeeAct/tree/sglang
 
-Run demo using this command:
+Follow the [setup guide](https://github.com/roywei/SeeAct/tree/sglang?tab=readme-ov-file#setup) to install the framework and PlayWright to control browser.
+
+The branch has already added support for BedrockEngine and SGLang for running inference with finetuned llama 3.2 vision model. The default option use Bedrock inference.
+
+To run demo, use the following command:
 ```
 python seeact.py -c config/demo_mode.toml
 ```
