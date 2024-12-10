@@ -50,7 +50,6 @@ For detailed instructions on each step, refer to the [AWS Deep Learning Containe
 Once your cluster is set up and verified, you're ready to proceed with fine-tuning the Llama 3.2 Vision model.
 
 
-Here's the finetuning section based on the provided guide:
 
 ## Fine-tuning Llama 3.2 Vision Model
 
