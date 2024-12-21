@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This guide provides step-by-step instructions for fine-tuning the Llama 3.2 Vision model on AWS. It is designed for the [AIM 368 Chalk Talk at AWS re:Invent 2024](https://registration.awsevents.com/flow/awsevents/reinvent24/public/page/catalog/?trk=81947bd1-bd21-4d56-a7ab-8d852cde0d92&sc_channel=sm&search=AIM368), slides will be available soon.
+This guide provides step-by-step instructions for fine-tuning the Llama 3.2 Vision model on AWS. It is designed for the [AIM 368 Chalk Talk at AWS re:Invent 2024](https://registration.awsevents.com/flow/awsevents/reinvent24/public/page/catalog/?trk=81947bd1-bd21-4d56-a7ab-8d852cde0d92&sc_channel=sm&search=AIM368), slides are [here](https://reinvent.awsevents.com/content/dam/reinvent/2024/slides/aim/AIM368_Fine-tuning-Llama-32-model-with-AWS-Deep-Learning-Containers.pdf).
 
 You will learn how to:
 1. Set up an AWS EKS cluster for AI workloads
